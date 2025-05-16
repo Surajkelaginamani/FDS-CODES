@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 4
+
+struct ticket {
+    char value[10];
+};
+
+int rear = -1, front = -1;
+struct ticket queue[MAX];
+
+void enqueue() {
+    char value[10];
+    printf("\nEnter the ticket number: ");
+    scanf("%s", value);
+
+    if ((rear + 1) % MAX == front) {
+        printf("Queue is full\n");
+        return;
+    }
+
+    if (front == -1 && rear == -1) {
+        front = rear = 0;
+    } else {
+        rear = (rear + 1) % MAX;
+    }
+
+    strcpy(queue[rear].value, value);
+    printf("Ticket number %s is added\n", value);
+}
+
+void dequeue() {
+    if (front == -1) {
+        printf("There are no tickets\n");
+        return;
+    }
+
+    printf("Ticket number %s is removed\n", queue[front].value);
+
+    if (front == rear) {
+        front = rear = -1;
+    } else {
+        front = (front + 1) % MAX;
+    }
+}
+
+void display() {
+    if (front == -1) {
+        printf("Queue is empty\n");
+        return;
+    }
+
+    printf("Tickets in the queue:\n");
+    int i = front;
+    while (i != rear) {
+        printf("Ticket no = %s\n", queue[i].value);
+        i = (i + 1) % MAX;
+    }
+    printf("Ticket no = %s\n", queue[rear].value);
+}
+
+int main() {
+    int ch;
+    while (1) {
+        printf("\nENTER YOUR CHOICE\n");
+        printf("1. Add Ticket\n");
+        printf("2. Remove Ticket\n");
+        printf("3. Display Tickets\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &ch);
+        switch (ch) {
+            case 1: enqueue(); 
+                    break;
+            case 2: dequeue(); 
+                    break;
+            case 3: display();
+                    break;
+            case 4: 
+                printf("Program exited.\n");
+                 break;
+            default: 
+                printf("Invalid choice\n");
+        }
+    }
+    return 0;
+}
