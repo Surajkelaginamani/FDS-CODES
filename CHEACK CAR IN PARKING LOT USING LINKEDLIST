@@ -1,0 +1,85 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+struct node {
+    char reg_no[10];
+    struct node *next;
+};
+struct node *head = NULL, *temp, *newnode = NULL,*prv;
+void insert(char *num) {
+    newnode = malloc(sizeof(struct node));
+    strcpy(newnode->reg_no, num);
+    newnode->next = NULL; 
+    if (head == NULL){
+        head = newnode; 
+    } else {
+        temp = head;
+        while (temp->next != NULL) {
+            temp = temp->next;
+        }
+        temp->next = newnode; 
+    }
+}
+void delete(char *rev){
+     temp = head;
+     while(temp!=NULL){
+         if(strcmp(temp->reg_no , rev) == 0){
+              prv->next=temp->next;
+              free(temp);
+              return ;
+         }
+          prv = temp;
+          temp=temp->next;
+     }
+    
+ }
+void display() {
+    temp = head;
+    printf("\nHere are the cars present in parking:\n");
+    while (temp != NULL) {
+        printf("Car no = %s \n", temp->reg_no);
+        temp = temp->next;
+    }
+}
+void searching(char *search){
+    temp = head;
+    int found = 0;
+    while(temp!=NULL){
+        if(strcmp(temp->reg_no,search)==0){
+            printf("\nCar found in parking\n");
+            found=1;
+            break;
+            }
+            temp=temp->next;
+        }
+        if(!found){
+        printf("\ncar not found\n");
+        }
+}
+int main(){
+   while(1){
+    int choice;
+    char num[10] , rev[10] , search[10];
+    printf("\n 1.) Add a car \n");
+    printf("\n 2.) Remove a car\n");
+    printf("\n 3.) display cars in parking \n");
+    printf("\n4.) search for a car\n");
+    scanf("%d",&choice);
+    switch(choice){
+        case 1: printf("Enter the registration number ");
+                scanf("%s",num);
+                insert(num);
+                break;
+        case 2: printf("Enter which car you want to Remove");
+                scanf("%s",rev);
+                delete(rev);
+                break;
+        case 3:display();
+               break;
+        case 4: printf("Enter car num you want to search");
+                scanf("%s",search);
+                searching(search);
+                break;
+    }
+    }
+}
