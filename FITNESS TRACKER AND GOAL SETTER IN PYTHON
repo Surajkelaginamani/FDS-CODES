@@ -1,0 +1,390 @@
+import json
+import datetime
+import random
+global health_status
+def calculate_bmi(weight, height):
+    height_m = height / 100
+    bmi = weight / (height_m ** 2)
+    return round(bmi, 2)
+
+def calculate_bmr(weight, height, age, gender):
+    if gender.lower() == 'male':
+        bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5
+    else:
+        bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161
+    return round(bmr, 2)
+
+def calculate_tdee(bmr, activity_level):
+    activity_multipliers = {
+        'sedentary': 1.2,
+        'light': 1.375,
+        'moderate': 1.55,
+        'active': 1.725,
+        'very active': 1.9
+    }
+    return round(bmr * activity_multipliers.get(activity_level, 1.2), 2)
+
+def calculate_bfp(bmi, age, gender):
+    if gender.lower() == 'male':
+        bfp = (1.20 * bmi) + (0.23 * age) - 16.2
+    else:
+        bfp = (1.20 * bmi) + (0.23 * age) - 5.4
+    return round(bfp, 2)
+
+def calculate_whtr(waist, height):
+    return round(waist / height, 2)
+
+def assess_health(bmi, whtr):
+    if bmi < 18.5:
+        return "Underweight"
+    elif 18.5 <= bmi < 24.9 and whtr < 0.5:
+        return "Healthy"
+    elif 25 <= bmi < 29.9:
+        return "Overweight"
+    elif bmi >= 30 or whtr >= 0.5:
+        return "Obese"
+    else:
+        return "At Risk"
+
+def goal_setter(health_status, height, tdee):
+    if health_status == "Underweight":
+        target_bmi = 20
+        target_weight = target_bmi * (height / 100) ** 2
+        caloric_goal = tdee + 500
+        return f"Goal: Gain weight. Target weight: {round(target_weight, 2)} kg. Eat ~{caloric_goal} kcal/day."
+    elif health_status in ["Overweight", "Obese"]:
+        target_bmi = 22
+        target_weight = target_bmi * (height / 100) ** 2
+        caloric_goal = tdee - 500
+        return f"Goal: Lose weight. Target weight: {round(target_weight, 2)} kg. Eat ~{caloric_goal} kcal/day. Exercise regularly."
+    elif health_status.lower() == "healthy":
+        return "Goal: Maintain a healthy lifestyle with a balanced diet and exercise."
+
+def workout_recommendation(goal):
+    gym_home = input("Would you prefer to work out at the gym or at home? (Enter 'gym' or 'home'): ").strip().lower()
+
+    if "gain weight" in goal.lower():
+        if gym_home == 'gym':
+            return [
+                "Strength training 3 times per week. Follow this recommendation:",
+                "- Squats (Legs, Core): Barbell or Smith Machine. Sets/Reps: 3–5 sets of 5–8 reps.",
+                "- Deadlifts (Back, Legs, Core): Barbell or Trap Bar. Sets/Reps: 3–5 sets of 5–8 reps.",
+                "- Bench Press (Chest, Shoulders, Triceps): Barbell or Dumbbells. Sets/Reps: 3–5 sets of 5–8 reps.",
+                "- Overhead Press (Shoulders, Triceps): Barbell or Dumbbells. Sets/Reps: 3–4 sets of 8–10 reps.",
+                "- Barbell Rows (Back, Biceps): Sets/Reps: 3–4 sets of 8–10 reps.",
+            ]
+        elif gym_home == 'home':
+            return [
+                "Strength training 3 times per week. Follow this recommendation:",
+                "- Push-Ups (Chest, Shoulders, Triceps): Variations like Standard, Wide, Diamond. Sets/Reps: 3 sets of 10–15 reps.",
+                "- Pull-Ups or Inverted Rows (Back, Biceps): Use a pull-up bar or sturdy furniture. Sets/Reps: 3 sets of 8–12 reps.",
+                "- Squats (Legs, Glutes): Variations like Bodyweight, Jump, Bulgarian Split. Sets/Reps: 3 sets of 12–15 reps.",
+                "- Plank Variations (Core Stability): Side Plank, Shoulder Tap Plank. Hold for 30–60 seconds, 3 rounds.",
+                "- Dips (Triceps, Chest, Shoulders): Use a sturdy chair. Sets/Reps: 3 sets of 10–12 reps.",
+            ]
+    elif "lose weight" in goal.lower():
+        if gym_home == 'gym':
+            return [
+                "Cardio 5 times per week (30-45 minutes per session). Options include:",
+                "- Treadmill running or jogging: Mix steady-state runs with intervals for higher calorie burn.",
+                "- Elliptical trainer: A low-impact option that's easy on the joints.",
+                "- Group fitness classes like spinning, Zumba, or kickboxing for motivation and intensity.",
+                "- Rowing machine: Provides a full-body cardio workout.",
+                "Strength training 2 times per week to preserve muscle mass:",
+                "- Squats, Deadlifts, and Bench Press: Focus on compound movements.",
+                "- Use moderate weights with 3 sets of 10–12 reps.",
+            ]
+        elif gym_home == 'home':
+            return [
+                "Cardio 5 times per week (30-45 minutes per session). Options include:",
+                "- Jump rope: A high-intensity, space-saving option.",
+                "- High knees, butt kicks, or jumping jacks: Effective bodyweight cardio drills.",
+                "- Online cardio dance or workout videos: Fun and engaging.",
+                "- Brisk walking or jogging in your neighborhood.",
+                "Strength training 2 times per week to preserve muscle mass:",
+                "- Push-ups and planks for upper body and core.",
+                "- Bodyweight squats and lunges for lower body.",
+                "- Resistance band exercises for added intensity.",
+            ]
+    else:
+        return [
+            "Follow a balanced fitness routine:",
+            "- Walk for 30 minutes daily to maintain cardiovascular health.",
+            "- Yoga or stretching 2 times per week to enhance flexibility and reduce stress:",
+            "  - Surya Namaskar (Sun Salutations): Full-body engagement.",
+            "  - Downward-Facing Dog: Stretches hamstrings and shoulders.",
+            "  - Cobra Pose: Strengthens the lower back and opens the chest.",
+            "  - Child’s Pose: A relaxing, restorative posture.",
+            "- Strength training 2–3 times per week for muscle tone and endurance:",
+            "  - Push-ups, squats, and planks for a full-body workout.",
+            "  - Use resistance bands or light weights for added intensity.",
+        ]
+
+def hydration_reminder():
+    now = datetime.datetime.now()
+    if now.hour in [8, 11, 14, 17, 20]:
+        print("Hydration Check: Drink a glass of water!")
+
+def motivational_quote():
+    quotes = [
+        "Push yourself, no one else is going to do it for you.",
+        "Small progress is still progress.",
+        "You are stronger than you think.",
+        "Wake up. Work out. Crush it.",
+        "Your only limit is your mind.",
+        "Fall in love with taking care of yourself."
+    ]
+    return random.choice(quotes)
+
+def log_progress(username, bmi, weight, calories):
+    filename = f"{username.lower().replace(' ', '_')}_progress_log.json"
+    today = str(datetime.date.today())
+    entry = {"date": today, "weight": weight, "bmi": bmi, "calories": calories}
+    try:
+        with open(filename, 'r') as f:
+            logs = json.load(f)
+    except FileNotFoundError:
+        logs = []
+    logs.append(entry)
+    with open(filename, 'w') as f:
+        json.dump(logs, f, indent=2)
+
+def save_user_data(username, data):
+    filename = f"{username.lower().replace(' ', '_')}_fitness_data.json"
+    with open(filename, 'w') as f:
+        json.dump(data, f, indent=2)
+    print(f"Progress saved to {filename}")
+
+def calorie_tracking(food_items):
+    print(food_items.keys())
+    print("\nLog your meals. Type 'done' when finished.")
+    total_calories = 0
+    while True:
+        food = input("Enter food item: ").lower()
+        if food == "done":
+            break
+        if food in food_items:
+            total_calories += food_items[food]
+            print(f"Added {food} ({food_items[food]} kcal)")
+        else:
+            print("Food item not found. Try again.")
+    return total_calories
+
+def workout_calorie_burn(health_status):
+    print("\nLog your workout activities for today. Type 'done' when finished.")
+    
+    if health_status == "Underweight":
+        
+        workout_activities = {
+            "push_ups": 7,
+            "bodyweight_squats": 5,
+            "plank": 3,
+            "jumping_jacks": 8,
+            "burpees": 10,
+            "yoga": 4,
+            "lunges": 6,
+            "high_knees": 9,
+            "-----FOR GYM-----": 0,
+            "treadmill_running": 11,
+            "cycling": 10,
+            "weightlifting": 5,
+            "bench_press": 6,
+            "deadlifts": 8,
+            "rowing_machine": 9,
+            "elliptical": 7,
+            "pull_ups": 8
+        }
+        print(workout_activities.keys())
+    elif health_status in ["Overweight", "Obese"]:
+        
+        workout_activities = {
+            "walking_in_place": 4.0,
+            "bodyweight_squats": 6.0,
+            "pushups_modified": 4.5,
+            "chair_tricep_dips": 5.0,
+            "jumping_jacks": 8.0,
+            "yoga_gentle": 3.0,
+            "step_ups": 6.5,
+            "high_knee_marching": 4.5,
+            "resistance_band_exercises": 4.0,
+            "-----FOR GYM-----": 0,
+            "treadmill_walking": 4.0,
+            "treadmill_incline_walking": 5.5,
+            "cycling_stationary": 6.5,
+            "elliptical_trainer": 7.0,
+            "weightlifting_light": 5.0,
+            "rowing_machine": 8.0,
+            "swimming_leisurely": 6.0,
+            "functional_training": 10.0,
+            "zumba_aerobics": 7.5
+        }
+        print(workout_activities.keys())
+    elif health_status.lower() == "healthy":
+        
+        workout_activities = {
+            "jumping_jacks": 10,
+            "push_ups": 8,
+            "bodyweight_squats": 7,
+            "burpees": 12,
+            "mountain_climbers": 11,
+            "plank_hold": 5,
+            "high_knees": 9,
+            "lunges": 6,
+            "-----FOR GYM-----": 0,
+            "treadmill_running": 12,
+            "stationary_cycling": 10,
+            "weight_lifting": 6,
+            "elliptical_trainer": 8,
+            "rowing_machine": 11,
+            "stair_climber": 9,
+            "bench_press": 5,
+            "deadlift": 7
+        }
+        print(workout_activities.keys())
+    else:
+        print("Invalid health status.")
+        return 0
+
+    total_calorie_burn = 0
+    while True:
+        workout = input("Enter workout activity: ").lower()
+        if workout == "done":
+            break
+        if workout in workout_activities:
+            try:
+                duration = int(input(f"Enter duration for {workout} (in minutes): "))
+                calories_burned = workout_activities[workout] * duration
+                total_calorie_burn += calories_burned
+                print(f"Added {workout}: Burned {calories_burned} kcal")
+            except ValueError:
+                print("Invalid duration. Please enter a number.")
+        else:
+            print("Workout activity not recognized. Try again.")
+    
+    return total_calorie_burn
+
+
+def calculate_weekly_progress(username):
+    filename = f"{username.lower().replace(' ', '_')}_progress_log.json"
+    try:
+        with open(filename, 'r') as f:
+            logs = json.load(f)
+    except FileNotFoundError:
+        print("No progress logs found. Start tracking daily to see weekly updates.")
+        return
+
+    # Aggregate weekly progress
+    if len(logs) < 7:
+        print("Not enough data for a weekly summary. Keep tracking daily!")
+        return
+
+    last_7_days = logs[-7:]
+    starting_weight = last_7_days[0]['weight']
+    ending_weight = last_7_days[-1]['weight']
+    starting_bmi = last_7_days[0]['bmi']
+    ending_bmi = last_7_days[-1]['bmi']
+
+    weight_change = ending_weight - starting_weight
+    bmi_change = ending_bmi - starting_bmi
+
+    # Weekly summary
+    print("\nWeekly Progress Summary:")
+    print(f"Start Weight: {starting_weight} kg")
+    print(f"End Weight: {ending_weight} kg")
+    print(f"Weight Change: {'+' if weight_change > 0 else ''}{weight_change:.2f} kg")
+    print(f"Start BMI: {starting_bmi}")
+    print(f"End BMI: {ending_bmi}")
+    print(f"BMI Change: {'+' if bmi_change > 0 else ''}{bmi_change:.2f}")
+    print("Keep up the good work!" if weight_change <= 0 else "Consider reviewing your goals and caloric intake.")
+
+def fitness_tracker():
+    print("Welcome to your Fitness Tracker App")
+    username = input("Enter your name: ")
+    weight = float(input("Enter your weight (kg): "))
+    height = float(input("Enter your height (cm): "))
+    age = int(input("Enter your age: "))
+    gender = input("Enter your gender (male/female): ").strip().lower()
+    activity_level = input("Enter activity level (sedentary, light, moderate, active, very active): ").strip().lower()
+    waist = float(input("Enter waist circumference (cm): "))
+
+    # Perform Calculations
+    bmi = calculate_bmi(weight, height)
+    bmr = calculate_bmr(weight, height, age, gender)
+    tdee = calculate_tdee(bmr, activity_level)
+    bfp = calculate_bfp(bmi, age, gender)
+    whtr = calculate_whtr(waist, height)
+    health_status = assess_health(bmi, whtr)
+    goal = goal_setter(health_status, height, tdee)
+
+    print("\nYour Fitness Report")
+    print(f"BMI: {bmi}")
+    print(f"BMR: {bmr} kcal/day")
+    print(f"TDEE: {tdee} kcal/day")
+    print(f"Body Fat %: {bfp}%")
+    print(f"Waist-to-Height Ratio: {whtr}")
+    print(f"Health Status: {health_status}")
+    print(f"{goal}\n")
+
+    workouts = workout_recommendation(goal)
+    print("Suggested Workouts:")
+    for w in workouts:
+        print(f"- {w}")
+
+    # Motivation
+    print("\nMotivation: " + motivational_quote())
+
+    # Calorie Tracking
+    food_items = {
+        'chapati': 240, 'rice': 130, 'dal': 348, 'paneer curry': 367,
+        'chicken curry': 306, 'poha': 158, 'shabudana khichadi': 400,
+        'egg': 72, 'milk': 149, 'apple': 104, 'banana': 105, 'tea': 50
+    }
+    today = str(datetime.date.today())
+    decision = input("Ready to start tracking? (START / MAYBE LATER): ").strip().lower()
+
+    if decision == "start":
+        calories = calorie_tracking(food_items)
+        workout_calories = workout_calorie_burn(health_status)
+
+        print(f"\nTotal calories consumed today: {calories} kcal")
+        print(f"Total calories burned from workouts: {workout_calories} kcal")
+        net_calories = calories - workout_calories
+        print(f"Net calorie intake for today: {net_calories} kcal")
+
+        caloric_difference = tdee - net_calories
+        if caloric_difference > 0:
+            print(f"You need to consume approximately {caloric_difference} more kcal today to meet your TDEE.")
+        elif caloric_difference < 0:
+            print(f"You have exceeded your TDEE by {abs(caloric_difference)} kcal. Consider reducing your intake.")
+        else:
+            print("You have perfectly balanced your caloric intake and TDEE for the day. Great job!")
+
+        # Save Progress
+        data = {
+            "user": username,
+            "date": today,
+            "bmi": bmi,
+            "bmr": bmr,
+            "tdee": tdee,
+            "bfp": bfp,
+            "whtr": whtr,
+            "health_status": health_status,
+            "goal": goal,
+            "calories_consumed": calories,
+            "workout_calories_burned": workout_calories,
+            "net_calories": net_calories
+        }
+        save_user_data(username, data)
+        log_progress(username, bmi, weight, calories)
+        print("Progress saved! Keep going strong!")
+
+        # Display weekly progress if applicable
+        calculate_weekly_progress(username)
+
+    elif decision == "maybe later":
+        print("No worries. Come back when you're ready!")
+    else:
+        print("Invalid input. Please restart.")
+
+
+fitness_tracker()
